@@ -1,0 +1,215 @@
+---
+title: "Manipulating Data using dplyr: Quiz & Exercises"
+output: 
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+    df_print: paged
+runtime: shiny_prerendered
+description: >
+  Learn to manipulate data with the package dplyr.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(knitr)
+library(dplyr)
+library(ggplot2)
+tutorial_options(exercise.timelimit = 10)
+options(max.print=1000, dplyr.summarise.inform = FALSE)
+load("imdb2022.RData")
+
+imdb %>% 
+  filter(type=="movie" & title!="Hot Bot") %>%
+  select(title,year,length,numVotes,averageRating,director,birthYear,deathYear)->imdb 
+```
+
+## Data exploration using 'dplyr' on the Internet Movie Database (IMDb)
+
+*Extract of full exercises for use in presentations*
+
+For this session, we are going to use a dataset which has been loaded into the code chunks as an object called `imdb`. This was based on extracts made from the Internet Movie Database which are available for non-commercial purposes by the IMDb team:
+<a href="https://www.imdb.com/interfaces/" target="_blank">https://www.imdb.com/interfaces/</a>
+
+
+
+It contains the following information for all the entries in the IMDB data sets which:
+
+* Were classified as "movies"
+* Have had more than 2000 voters rating the movie on a scale of 0-10
+* Had non-missing data for title, year of release, running time, and name of director(s)
+
+The data has been cleaned slightly to make it easier for you to work with, but all of the information within it is the 'real' version of the data as extracted in 2022. A summary of the included variables is found below:
+
+```{r, echo=FALSE,message=FALSE,warning=FALSE}
+
+data.frame(Column=c("title","year","length","numVotes","averageRating","director","birthYear","deathYear"),
+           Description=c("Title of the movie",
+                         "Year of release",
+                         "Duration (minutes)",
+                         "Number of votes for the average rating of the entry",
+                         "IMDb's weighted average rating for the entry",
+                         "Director of the entry (if multiple directors, the first one was picked)",
+                         "Year of birth of the director",
+                         "Year of death of the director"
+                       )) %>% kable()
+
+```
+
+
+The dataset has 25,901 rows. It's too much to be displayed in full here or for you to look through the whole thing! Running the code chunk below will show you the first 20 rows from the data through the call to the `head()` function. 
+
+Before moving onto the exercises spend a bit of time use this code chunk to write some simple summary functions to help familiarise yourself with the structure and columns of the `imdb` data frame by using some of the other data exploration functions you have come across so far in this course (e.g. `summary()`, `table()`). Remember that you can use the arrows to scroll to the right to see more of the columns.
+
+```{r data,exercise=TRUE}
+imdb %>%
+  head(n = 20)
+
+```
+
+...
+
+### Exercise 5. 
+
+Using the pipe operator `%>%` to link together `dplyr` functions create a new column containing the age of the director at the time of the movie's release and then using this column determine the age of the youngest and the oldest known ages of directors at the time their movie was released.
+*Hint - You may find that not all directors have a known year of birth*
+
+```{r ex5,exercise=TRUE}
+
+
+```
+
+
+```{r ex5-solution}
+# There is a lot more to this question than you might initially realise... 
+
+# If you think the answer is that the youngest director was 11 and the oldest
+# director was 103 then you are wrong on both counts. 
+
+# Maybe go back and think a bit more then try again before scrolling down to the
+# answer below.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# What I expect you to get to first, by recognising that where there are missing
+# values we need to use na.rm=TRUE in the summary functions, and that a little
+# bit of translation from human to R is needed: "youngest"=min(age) and
+# "oldest"=max(age). You could also have added a line to filter() to remove the missing
+# values out that way instead of the na.rm=TRUE.
+
+imdb %>%
+  mutate(DirectorReleaseAge=year-birthYear) %>%
+      summarise(Youngest=min(DirectorReleaseAge, na.rm=TRUE),  Oldest=max(DirectorReleaseAge, na.rm=TRUE))
+      
+# Hopefully some of you might start looking at those numbers and questioning these results though!
+# And before going any further it is worth considering that around 24% of films are directed by people with an unknown birth year. So there are pretty decent chances that among that 24% there might be someone older or younger.
+# But that is not the main issue though...
+
+# Let's look at the oldest first, as 103 is provably an incorrect answer within R.
+
+imdb %>%
+  mutate(DirectorReleaseAge=year-birthYear) %>%
+    filter(DirectorReleaseAge==103)
+
+# Orson Welles died in 1985. So don't think we can say with any validity that he
+# was the "oldest" director for a film released 33 years after his death! We
+# should either set posthumous releases to have a missing value for age or we
+# should exclude them from the analysis. Let's go with the second option as this
+# is a little bit cleaner to include in a piped series of commands. Now there
+# may still be issues. NA for "deathYear" could mean that the director is still
+# alive or it could mean that the deathYear is unknown. And someone could have died
+# before their movie was released, but in the same year. So there may still be
+# inconsistencies in our age calculations, but it is at least better than it was
+# before
+
+imdb %>%
+  mutate(DirectorReleaseAge=year-birthYear) %>%
+    filter(year<=deathYear | is.na(deathYear)) %>%
+      summarise(Youngest=min(DirectorReleaseAge, na.rm=TRUE),  Oldest=max(DirectorReleaseAge, na.rm=TRUE))
+
+imdb %>%
+  mutate(DirectorReleaseAge=year-birthYear) %>%
+    filter(year<=deathYear | is.na(deathYear)) %>%
+    filter(DirectorReleaseAge==102)
+      
+# This one seems to be legit! https://en.wikipedia.org/wiki/Manoel_de_Oliveira
+# "Beginning in the late 1980s he was one of the most prolific working film
+# directors and made an average of one film per year past the age of 100" Sounds
+# like he may have made more films after this one as well, but probably didn't
+# reach the popularity threshold we put on to create this subset
+
+# Now let's move to the youngest. This needs some research and a few assumptions to be made!
+imdb %>%
+  mutate(DirectorReleaseAge=year-birthYear) %>%
+    filter(year<=deathYear | is.na(deathYear)) %>%
+    filter(DirectorReleaseAge==11)
+    
+
+# I am a little suspicious of how an 11 year old is directing Egyptian comedies:
+# https://www.imdb.com/title/tt2210509/
+
+# Let's check out his IMDB profile: https://www.imdb.com/name/nm12679691/
+
+# In the 2010s he seemed to be working both as a child actor and also a
+# director/casting director! Busy schedule to do all of that on top of school
+# and stuff... or maybe there are two Abdelrahman Yassers and IMDB doesn't
+# realise this because we are right down in some obscure depths of Egyptian
+# cinema here where the active user base is a bit lower to spot this sort of
+# thing?
+
+# There is this guy, who is a relatively successful Egyptian actor (born in
+# 1999): https://www.amazon.co.uk/prime-video/actor/Abdelrahman-Yasser/ 
+
+# And there is this guy who co-directed a few things and is much less well
+# known: https://www.linkedin.com/in/yasser-abdelrahman-1400b373 but started
+# working for Egyptian television in 1999 so is surely not the same person.
+
+# Sometimes the data is not correct! The data is created by humans! And humans
+# make mistakes all the time Ideally we should go back and correct our data (but
+# this will ruin my example for future years!) when we find errors
+
+# In this case lets just set the "director" Abdelrahman Yasser's birthyear to be
+# unknown using case_when() inside of mutate(). Since we already have so many
+# missing values this one doesn't change much.
+
+
+imdb %>%
+  mutate(birthYear = case_when(director=="Abdelrahman Yasser"~NA,
+                                              .default=birthYear)) %>%
+  mutate(DirectorReleaseAge=year-birthYear) %>%
+    filter(year<=deathYear | is.na(deathYear)) %>%
+      summarise(Youngest=min(DirectorReleaseAge, na.rm=TRUE),  Oldest=max(DirectorReleaseAge, na.rm=TRUE))
+    
+# So let's take a look again. A 18 year old director sounds a lot more plausible
+# to me!
+
+imdb %>%
+  mutate(DirectorReleaseAge=year-birthYear) %>%
+    filter(year<=deathYear | is.na(deathYear)) %>%
+    filter(DirectorReleaseAge==18)
+    
+# https://en.wikipedia.org/wiki/Samira_Makhmalbaf 
+# "At the age of 17, after
+# directing two video productions, Makhmalbaf went on to direct her first
+# feature film, La Pomme (The Apple)." So she was 17 at time of directing the film and 18 at time of
+# release. 
+# Which all matches up - we made it!
+
+```
+
+
