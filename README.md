@@ -8,3 +8,17 @@ The tutorial can be viewed online here:
 https://shiny.stats4sd.org/dplyr_learnr__live/
 
 Intentionally the formatting is kept to a minimum within the RMD file. That way by the time we get to the end of the course the participants are then able to see exactly how relatively simple it is to construct a coherent script without putting in a lot of flashy, but more complicated, formatting.
+
+Part of RSS 2024 Conference session - R without fear: teaching strategies to make R accessible to everyone
+
+*Organised by Oxford University Statistical Consulting: Maria Christodoulou, Cora Mezger, Mariagrazia Zottoli.*
+
+Speakers:
+
+* Sam Dumble: [Learning R in a classroom or online? A natural experiment](https://github.com/stats4sd/dplyr_learnr/raw/main/Learning%20R%20Sam%20Dumble%20September%203%20RSS.pptx)
+
+* Nicola Rennie: [More interactive, more engaging - teaching R in a lecture environment](https://nrennie.rbind.io/rss-2024-teaching-r/)
+
+* Jenny Terry : Overcoming Emotional and Attitudinal Barriers in the Teaching and Learning of R
+
+* Maria Christodoulou and Mariagrazia Zottoli: Splitting the Load – Making students comfortable with R before throwing t-tests at them
