@@ -22,3 +22,5 @@ Speakers:
 * Jenny Terry : Overcoming Emotional and Attitudinal Barriers in the Teaching and Learning of R
 
 * Maria Christodoulou and Mariagrazia Zottoli: Splitting the Load – Making students comfortable with R before throwing t-tests at them
+
+**Programme**: [virtual.oxfordabstracts.com/#/event/6693](https://virtual.oxfordabstracts.com/#/event/6693/program?session=92655&s=1037)
